@@ -17,9 +17,9 @@ document.querySelector("#year").textContent = new Date().getFullYear();
 
 // Personalize these links before publishing.
 const profile = {
-  github: "https://github.com/SEU-USUARIO",
-  linkedin: "https://www.linkedin.com/in/SEU-PERFIL/",
-  email: "SEU-EMAIL@EXEMPLO.COM"
+  github: "https://github.com/FSAzevedo9",
+  linkedin: "https://www.linkedin.com/in/felipe-azevedo-a436aa2b0",
+  email: "fs9315780@gmail.com"
 };
 
 document.querySelector("#github-link").href = profile.github;
