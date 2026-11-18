@@ -1,0 +1,282 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta name="description" content="Dashboard interativo de análise de ocorrências aeronáuticas no Brasil, com dados públicos da ANAC.">
+
+  <title>Análise de Ocorrências Aeronáuticas | Felipe Azevedo</title>
+
+  <link rel="stylesheet" href="../assets/projetos/ocorrencias.css">
+
+  <!-- Biblioteca de gráficos -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Biblioteca de mapas -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  >
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+
+<body>
+
+  <header class="dashboard-header">
+    <a href="../index.html" class="back-link">← Voltar ao portfólio</a>
+
+    <div class="header-content">
+      <span class="eyebrow">AVIATION DATA ANALYTICS</span>
+      <h1>Análise de Ocorrências Aeronáuticas</h1>
+      <p>
+        Uma visão analítica da segurança operacional da aviação brasileira,
+        baseada em dados públicos da ANAC.
+      </p>
+    </div>
+
+    <div class="header-info">
+      <span>Fonte: ANAC</span>
+      <span>Período: 2016–2024</span>
+    </div>
+  </header>
+
+  <main class="dashboard-container">
+
+    <!-- FILTROS -->
+    <section class="filter-panel">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">EXPLORAÇÃO</span>
+          <h2>Filtros de análise</h2>
+        </div>
+        <button id="clear-filters" class="clear-button">
+          Limpar filtros
+        </button>
+      </div>
+
+      <div class="filters">
+        <label>
+          Ano
+          <select id="filter-year">
+            <option value="">Todos os anos</option>
+          </select>
+        </label>
+
+        <label>
+          Classificação
+          <select id="filter-classification">
+            <option value="">Todas</option>
+            <option value="Acidente">Acidente</option>
+            <option value="Incidente Grave">Incidente grave</option>
+          </select>
+        </label>
+
+        <label>
+          Região
+          <select id="filter-region">
+            <option value="">Todas as regiões</option>
+          </select>
+        </label>
+
+        <label>
+          UF
+          <select id="filter-state">
+            <option value="">Todas as UFs</option>
+          </select>
+        </label>
+      </div>
+    </section>
+
+    <!-- INDICADORES -->
+    <section class="kpi-section">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">PANORAMA GERAL</span>
+          <h2>Indicadores principais</h2>
+        </div>
+      </div>
+
+      <div class="kpi-grid">
+        <article class="kpi-card">
+          <span>Total de ocorrências</span>
+          <strong id="kpi-total">—</strong>
+          <small>Ocorrências registradas</small>
+        </article>
+
+        <article class="kpi-card">
+          <span>Acidentes</span>
+          <strong id="kpi-accidents">—</strong>
+          <small>Ocorrências classificadas como acidente</small>
+        </article>
+
+        <article class="kpi-card">
+          <span>Incidentes graves</span>
+          <strong id="kpi-incidents">—</strong>
+          <small>Ocorrências classificadas como incidente grave</small>
+        </article>
+
+        <article class="kpi-card">
+          <span>Vítimas fatais</span>
+          <strong id="kpi-fatalities">—</strong>
+          <small>Vítimas registradas na base</small>
+        </article>
+      </div>
+    </section>
+
+    <!-- EVOLUÇÃO TEMPORAL -->
+    <section class="dashboard-section">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">SÉRIE HISTÓRICA</span>
+          <h2>Evolução das ocorrências</h2>
+        </div>
+      </div>
+
+      <div class="chart-grid">
+        <article class="chart-card chart-large">
+          <h3>Ocorrências por ano</h3>
+          <canvas id="chart-year"></canvas>
+        </article>
+
+        <article class="chart-card">
+          <h3>Distribuição mensal</h3>
+          <canvas id="chart-month"></canvas>
+        </article>
+      </div>
+    </section>
+
+    <!-- DISTRIBUIÇÃO GEOGRÁFICA -->
+    <section class="dashboard-section">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">ANÁLISE TERRITORIAL</span>
+          <h2>Distribuição geográfica</h2>
+        </div>
+      </div>
+
+      <div class="chart-grid">
+        <article class="chart-card">
+          <h3>Ocorrências por região</h3>
+          <canvas id="chart-region"></canvas>
+        </article>
+
+        <article class="chart-card">
+          <h3>Ocorrências por UF</h3>
+          <canvas id="chart-state"></canvas>
+        </article>
+      </div>
+
+      <article class="chart-card map-card">
+        <h3>Localização das ocorrências</h3>
+        <div id="occurrence-map"></div>
+      </article>
+    </section>
+
+    <!-- TIPOS DE OCORRÊNCIA -->
+    <section class="dashboard-section">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">CLASSIFICAÇÃO</span>
+          <h2>Tipos de ocorrência</h2>
+        </div>
+      </div>
+
+      <article class="chart-card">
+        <h3>Descrições mais frequentes</h3>
+        <canvas id="chart-types"></canvas>
+      </article>
+    </section>
+
+    <!-- AERONAVES -->
+    <section class="dashboard-section">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">CARACTERÍSTICAS DAS AERONAVES</span>
+          <h2>Fabricantes e modelos</h2>
+        </div>
+      </div>
+
+      <div class="chart-grid">
+        <article class="chart-card">
+          <h3>Ocorrências por fabricante</h3>
+          <canvas id="chart-manufacturers"></canvas>
+        </article>
+
+        <article class="chart-card">
+          <h3>Ocorrências por modelo</h3>
+          <canvas id="chart-models"></canvas>
+        </article>
+      </div>
+    </section>
+
+    <!-- VÍTIMAS E HISTÓRICO -->
+    <section class="dashboard-section">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">CONSEQUÊNCIAS E REGISTROS</span>
+          <h2>Vítimas e histórico</h2>
+        </div>
+      </div>
+
+      <div class="chart-grid">
+        <article class="chart-card">
+          <h3>Distribuição de vítimas</h3>
+          <canvas id="chart-victims"></canvas>
+        </article>
+
+        <article class="chart-card">
+          <h3>Evolução anual de vítimas</h3>
+          <canvas id="chart-victims-year"></canvas>
+        </article>
+      </div>
+
+      <article class="chart-card history-card">
+        <h3>Consulta de ocorrências</h3>
+
+        <div class="search-box">
+          <input
+            type="search"
+            id="search-occurrence"
+            placeholder="Pesquisar pelo número da ocorrência..."
+          >
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Número</th>
+                <th>Data</th>
+                <th>Município</th>
+                <th>UF</th>
+                <th>Classificação</th>
+              </tr>
+            </thead>
+            <tbody id="occurrence-table">
+              <tr>
+                <td colspan="5">Carregando dados...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+
+    <footer class="dashboard-footer">
+      <p>
+        Fonte dos dados: Agência Nacional de Aviação Civil (ANAC).
+      </p>
+      <p>
+        Dados analisados de 2016 a 22 de junho de 2024.
+      </p>
+      <p>Desenvolvido por Felipe Azevedo.</p>
+    </footer>
+
+  </main>
+
+  <script src="../assets/projetos/ocorrencias.js"></script>
+
+</body>
+</html>
